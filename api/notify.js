@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 console.log('Отправляем запрос...');
-fetch('https://telegram-notifier-d8naoa938-ilyas-projects-ad2eeef6.vercel.app/api/notify', {
+fetch('https://telegram-notifier.vercel.app/api/notify', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ message: 'Тест', userId: '275066977' })
