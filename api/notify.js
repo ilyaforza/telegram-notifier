@@ -2,6 +2,20 @@
 import axios from 'axios';
 
 export default async function handler(req, res) {
+  // 👇 Добавляем CORS-заголовки
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Разрешаем всем доменам (для теста)
+  // Если хотите разрешить только localhost, замените на:
+  // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Обработка OPTIONS-запроса (предварительный запрос CORS)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // Остальной код оставляем без изменений
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Метод не разрешён. Используйте POST.' });
   }
