@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    await axios.post(https://api.telegram.org/bot/sendMessage, {
+    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       chat_id: userId,
       text: message,
       parse_mode: 'HTML'
