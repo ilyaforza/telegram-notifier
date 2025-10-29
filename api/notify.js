@@ -2,58 +2,39 @@
 import axios from 'axios';
 
 export default async function handler(req, res) {
-  // 👇 Добавляем CORS-заголовки
-const allowedOrigins = ['http://localhost:5173','https://unionfloors.ru/protections']
-const origin = req.headers.origin;
-if (allowedOrigins.includes(origin)) {
-  res.setHeader('Access-Control-Allow-Origin', origin);
-}
-  
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Обработка OPTIONS-запроса (предварительный запрос CORS)
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Остальной код оставляем без изменений
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Метод не разрешён. Используйте POST.' });
   }
 
   const { message, userId } = req.body;
-
-  const BOT_TOKEN = process.env.BOT_TOKEN;
-  const DEFAULT_CHAT_ID = process.env.TELEGRAM_USER_ID;
-
-  const targetChatId = userId || DEFAULT_CHAT_ID;
+  const BOT_TOKEN = process.env.BOT_TOKEN; // ← берётся из Vercel Env
 
   if (!BOT_TOKEN) {
-    console.error('❌ BOT_TOKEN не задан в переменных окружения');
+    console.error('❌ BOT_TOKEN не задан в Vercel Environment Variables');
     return res.status(500).json({ error: 'Сервер не настроен: отсутствует BOT_TOKEN' });
   }
 
-  if (!targetChatId) {
+  if (!userId || !message) {
     return res.status(400).json({
       error: 'Не указан userId. Передайте его в теле запроса или задайте TELEGRAM_USER_ID в Vercel Environment Variables.',
     });
   }
 
-  if (!message || typeof message !== 'string') {
-    return res.status(400).json({
-      error: 'Тело запроса должно содержать поле "message" (текст уведомления).',
-    });
-  }
-
   try {
     const response = await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      chat_id: targetChatId,
+      chat_id: userId,
       text: message,
       parse_mode: 'HTML',
     });
 
-    console.log(`✅ Сообщение отправлено пользователю ${targetChatId}`);
+    console.log(`✅ Сообщение отправлено пользователю ${userId}`);
     return res.status(200).json({
       success: true,
       message: 'Уведомление отправлено в Telegram.',
