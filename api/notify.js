@@ -2,10 +2,9 @@
 import axios from 'axios';
 
 export default async function handler(req, res) {
-  // 👇 Добавляем CORS-заголовки
   const allowedOrigins = [
     'http://localhost:5173',
-    'https://unionfloors.ru' // Убраны лишние пробелы!
+    'https://unionfloors.ru'
   ];
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
@@ -18,7 +17,6 @@ export default async function handler(req, res) {
   console.log('Метод запроса:', req.method);
   console.log('Origin:', req.headers.origin);
 
-  // Обработка OPTIONS-запроса (предварительный запрос CORS)
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -53,7 +51,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ✅ Исправлен URL: убраны пробелы в `bot${BOT_TOKEN}`
     const response = await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       chat_id: targetChatId,
       text: message,
