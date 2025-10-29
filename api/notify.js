@@ -2,42 +2,67 @@
 import axios from 'axios';
 
 export default async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  // 👇 Добавляем CORS-заголовки
+ const allowedOrigins = ['http://localhost:5173','https://unionfloors.ru/protections']
+const origin = req.headers.origin;
+if (allowedOrigins.includes(origin)) {
+  res.setHeader('Access-Control-Allow-Origin', origin);
+}
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  // Обработка OPTIONS-запроса (предварительный запрос CORS)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
+  // Остальной код оставляем без изменений
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Только POST' });
+    return res.status(405).json({ error: 'Метод не разрешён. Используйте POST.' });
   }
 
   const { message, userId } = req.body;
 
-  if (!userId || !message) {
-    return res.status(400).json({ error: 'Требуются userId и message' });
+  const BOT_TOKEN = process.env.BOT_TOKEN;
+  const DEFAULT_CHAT_ID = process.env.TELEGRAM_USER_ID;
+
+  const targetChatId = userId || DEFAULT_CHAT_ID;
+
+  if (!BOT_TOKEN) {
+    console.error('❌ BOT_TOKEN не задан в переменных окружения');
+    return res.status(500).json({ error: 'Сервер не настроен: отсутствует BOT_TOKEN' });
   }
 
-  const BOT_TOKEN = process.env.BOT_TOKEN;
-  if (!BOT_TOKEN) {
-    console.error('❌ BOT_TOKEN не задан в Vercel Environment Variables');
-    return res.status(500).json({ error: 'Сервер не настроен' });
+  if (!targetChatId) {
+    return res.status(400).json({
+      error: 'Не указан userId. Передайте его в теле запроса или задайте TELEGRAM_USER_ID в Vercel Environment Variables.',
+    });
+  }
+
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({
+      error: 'Тело запроса должно содержать поле "message" (текст уведомления).',
+    });
   }
 
   try {
     const response = await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      chat_id: userId,
+      chat_id: targetChatId,
       text: message,
-      parse_mode: 'HTML'
+      parse_mode: 'HTML',
     });
 
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    console.error('❌ Telegram error:', err.response?.data || err.message);
+    console.log(`✅ Сообщение отправлено пользователю ${targetChatId}`);
+    return res.status(200).json({
+      success: true,
+      message: 'Уведомление отправлено в Telegram.',
+    });
+  } catch (error) {
+    console.error('❌ Ошибка отправки в Telegram:', error.response?.data || error.message);
     return res.status(500).json({
-      error: 'Ошибка отправки',
-      details: err.response?.data || err.message
+      error: 'Не удалось отправить сообщение в Telegram.',
+      details: error.response?.data || error.message,
     });
   }
 }
