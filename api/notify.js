@@ -1,14 +1,5 @@
 // /api/notify.js
 import axios from 'axios';
-import { config } from 'dotenv';
-
-// Загружаем .env только в development (Vercel использует свои переменные окружения)
-if (process.env.NODE_ENV !== 'production') {
-  config();
-}
-
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const DEFAULT_CHAT_ID = process.env.TELEGRAM_USER_ID;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,6 +7,9 @@ export default async function handler(req, res) {
   }
 
   const { message, userId } = req.body;
+
+  const BOT_TOKEN = process.env.BOT_TOKEN;
+  const DEFAULT_CHAT_ID = process.env.TELEGRAM_USER_ID;
 
   const targetChatId = userId || DEFAULT_CHAT_ID;
 

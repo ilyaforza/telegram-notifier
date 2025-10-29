@@ -1,25 +1,11 @@
 {
   "name": "telegram-notifier",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "vercel dev"
   },
   "dependencies": {
     "axios": "^1.6.0"
-  },
-  "description": "",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ilyaforza/telegram-notifier.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ilyaforza/telegram-notifier/issues"
-  },
-  "homepage": "https://github.com/ilyaforza/telegram-notifier#readme"
-  
+  }
 }
