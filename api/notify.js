@@ -3,7 +3,10 @@ import axios from 'axios';
 
 export default async function handler(req, res) {
   // 👇 Добавляем CORS-заголовки
- const allowedOrigins = ['http://localhost:5173','https://unionfloors.ru/protections']
+ const allowedOrigins = [
+  'http://localhost:5173',
+  'https://unionfloors.ru'
+];
 const origin = req.headers.origin;
 if (allowedOrigins.includes(origin)) {
   res.setHeader('Access-Control-Allow-Origin', origin);
@@ -11,6 +14,9 @@ if (allowedOrigins.includes(origin)) {
   
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  console.log('Метод запроса:', req.method);
+console.log('Origin:', req.headers.origin);
 
   // Обработка OPTIONS-запроса (предварительный запрос CORS)
   if (req.method === 'OPTIONS') {
