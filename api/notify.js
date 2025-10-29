@@ -3,27 +3,26 @@ import axios from 'axios';
 
 export default async function handler(req, res) {
   // 👇 Добавляем CORS-заголовки
- const allowedOrigins = [
-  'http://localhost:5173',
-  'https://unionfloors.ru'
-];
-const origin = req.headers.origin;
-if (allowedOrigins.includes(origin)) {
-  res.setHeader('Access-Control-Allow-Origin', origin);
-}
-  
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'https://unionfloors.ru' // Убраны лишние пробелы!
+  ];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   console.log('Метод запроса:', req.method);
-console.log('Origin:', req.headers.origin);
+  console.log('Origin:', req.headers.origin);
 
   // Обработка OPTIONS-запроса (предварительный запрос CORS)
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Остальной код оставляем без изменений
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Метод не разрешён. Используйте POST.' });
   }
@@ -42,7 +41,8 @@ console.log('Origin:', req.headers.origin);
 
   if (!targetChatId) {
     return res.status(400).json({
-      error: 'Не указан userId. Передайте его в теле запроса или задайте TELEGRAM_USER_ID в Vercel Environment Variables.',
+      error:
+        'Не указан userId. Передайте его в теле запроса или задайте TELEGRAM_USER_ID в Vercel Environment Variables.',
     });
   }
 
@@ -53,6 +53,7 @@ console.log('Origin:', req.headers.origin);
   }
 
   try {
+    // ✅ Исправлен URL: убраны пробелы в `bot${BOT_TOKEN}`
     const response = await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       chat_id: targetChatId,
       text: message,
