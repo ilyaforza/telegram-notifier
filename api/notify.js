@@ -1,10 +1,20 @@
 // /api/notify.js
 import axios from 'axios';
 
+console.log('Отправляем запрос...');
+fetch('https://telegram-notifier-d8naoa938-ilyas-projects-ad2eeef6.vercel.app/api/notify', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: 'Тест', userId: '275066977' })
+})
+.then(res => res.json())
+.then(data => console.log('Ответ:', data))
+.catch(err => console.error('Ошибка:', err));
+
 export default async function handler(req, res) {
   const allowedOrigins = [
     'http://localhost:5173',
-    'https://unionfloors.ru'
+    'https://unionfloors.ru/protections',
   ];
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
