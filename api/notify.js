@@ -1,6 +1,6 @@
-﻿import axios from 'axios';
+﻿const axios = require('axios');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Only POST allowed' });
   }
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    await axios.post(https://api.telegram.org/bot/sendMessage, {
+    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       chat_id: userId,
       text: message,
       parse_mode: 'HTML'
@@ -27,4 +27,4 @@ export default async function handler(req, res) {
     console.error('Telegram error:', err.response?.data || err.message);
     res.status(500).json({ error: 'Send failed' });
   }
-}
+};
