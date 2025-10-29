@@ -3,9 +3,11 @@ import axios from 'axios';
 
 export default async function handler(req, res) {
   // 👇 Добавляем CORS-заголовки
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Разрешаем всем доменам (для теста)
-  // Если хотите разрешить только localhost, замените на:
-  // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+const allowedOrigins = ['http://localhost:5173','https://unionfloors.ru/protections']
+const origin = req.headers.origin;
+if (allowedOrigins.includes(origin)) {
+  res.setHeader('Access-Control-Allow-Origin', origin);
+}
   
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
