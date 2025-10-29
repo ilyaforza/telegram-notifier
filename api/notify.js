@@ -1,31 +1,17 @@
-// /api/notify.js
 import axios from 'axios';
-
-console.log('Отправляем запрос...');
-fetch('https://telegram-notifier.vercel.app/api/notify', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ message: 'Тест', userId: '275066977' })
-})
-.then(res => res.json())
-.then(data => console.log('Ответ:', data))
-.catch(err => console.error('Ошибка:', err));
 
 export default async function handler(req, res) {
   const allowedOrigins = [
     'http://localhost:5173',
-    'https://unionfloors.ru/protections',
+    'https://unionfloors.ru',
   ];
   const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
+  if (origin && allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  console.log('Метод запроса:', req.method);
-  console.log('Origin:', req.headers.origin);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -39,7 +25,6 @@ export default async function handler(req, res) {
 
   const BOT_TOKEN = process.env.BOT_TOKEN;
   const DEFAULT_CHAT_ID = process.env.TELEGRAM_USER_ID;
-
   const targetChatId = userId || DEFAULT_CHAT_ID;
 
   if (!BOT_TOKEN) {
@@ -61,7 +46,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       chat_id: targetChatId,
       text: message,
       parse_mode: 'HTML',
