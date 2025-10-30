@@ -1,4 +1,3 @@
-// /api/notify.js
 import axios from 'axios';
 
 export default async function handler(req, res) {
@@ -29,18 +28,21 @@ export default async function handler(req, res) {
   const targetChatId = userId || DEFAULT_CHAT_ID;
 
   if (!BOT_TOKEN) {
-    console.error('❌ BOT_TOKEN не задан');
+    console.error('❌ BOT_TOKEN не задан в переменных окружения');
     return res.status(500).json({ error: 'Сервер не настроен: отсутствует BOT_TOKEN' });
   }
 
   if (!targetChatId) {
     return res.status(400).json({
-      error: 'Не указан получатель. Укажите userId или задайте TELEGRAM_USER_ID.',
+      error:
+        'Не указан userId. Передайте его в теле запроса или задайте TELEGRAM_USER_ID в Vercel Environment Variables.',
     });
   }
 
   if (!message || typeof message !== 'string') {
-    return res.status(400).json({ error: 'Требуется текст сообщения (поле "message").' });
+    return res.status(400).json({
+      error: 'Тело запроса должно содержать поле "message" (текст уведомления).',
+    });
   }
 
   try {
@@ -50,10 +52,16 @@ export default async function handler(req, res) {
       parse_mode: 'HTML',
     });
 
-    console.log(`✅ Отправлено: ${targetChatId}`);
-    return res.status(200).json({ success: true });
+    console.log(`✅ Сообщение отправлено пользователю ${targetChatId}`);
+    return res.status(200).json({
+      success: true,
+      message: 'Уведомление отправлено в Telegram.',
+    });
   } catch (error) {
-    console.error('❌ Telegram error:', error.response?.data || error.message);
-    return res.status(500).json({ error: 'Ошибка отправки в Telegram.' });
+    console.error('❌ Ошибка отправки в Telegram:', error.response?.data || error.message);
+    return res.status(500).json({
+      error: 'Не удалось отправить сообщение в Telegram.',
+      details: error.response?.data || error.message,
+    });
   }
 }
